@@ -1,3 +1,17 @@
+from flask import Flask, jsonify, request
+import psycopg2
+import os
+
+database_name = os.environ.get('DATABASE_NAME')
+app_host = os.environ.get('APP_HOST')
+app_port = os.environ.get('APP_PORT')
+
+conn = psycopg2.connect(f"dbname={database_name}")
+cursor = conn.cursor()
+
+
+app = Flask(__name__)
+
 
 def add_company():
     post_data = request.form if request.form else request.get_json()

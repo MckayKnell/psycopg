@@ -77,7 +77,7 @@ def get_by_category_id(category_id):
     return jsonify({"message": f'categories with id {category_id} not found.'}), 404
 
 
-def update_categories(category_id):
+def update_category(category_id):
     post_data = request.form if request.form else request.get_json()
 
     result = cursor.execute("""

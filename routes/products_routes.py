@@ -1,44 +1,44 @@
 from flask import Blueprint
 from controllers import products_controller
 
-product = Blueprint('products', __name__)
+products = Blueprint('products', __name__)
 
 
-@app.route('/products', methods=['POST'])
+@products.route('/products', methods=['POST'])
 def add_product():
     return products_controller.add_product()
 
 
-@app.route('/products/categories', methods=('POST'))
+@products.route('/products/categories', methods=['POST'])
 def add_product_category():
     return products_controller.add_product_category()
 
 
-@app.route('/products', methods=['GET'])
+@products.route('/products', methods=['GET'])
 def products_get_all():
     return products_controller.products_get_all()
 
 
-@app.route('/products/active', methods=('GET'))
+@products.route('/products/active', methods=['GET'])
 def get_active_products():
     return products_controller.get_active_product()
 
 
-@app.route('/products/companies/<id>', methods=['GET'])
-def products_by__company_id():
-    return products_controller.products_by_company_id()
+@products.route('/products/companies/<company_id>', methods=['GET'])
+def products_by__company_id(company_id):
+    return products_controller.products_by_company_id(company_id)
 
 
-@app.route('/products/<id>', methods=['GET'])
+@products.route('/products/<product_id>', methods=['GET'])
 def get_by_product_id(product_id):
-    return products_controller.get_by_product_id()
+    return products_controller.get_by_product_id(product_id)
 
 
-@app.route('/products/<id>', methods=['PUT'])
+@products.route('/products/<product_id>', methods=['PUT'])
 def update_products(product_id):
-    return products_controller.update_products()
+    return products_controller.update_products(product_id)
 
 
-@app.route('/products/delete', methods=['DELETE'])
-def remove_product():
-    return products_controller.remove_product()
+@products.route('/products/delete/<product_id>', methods=['DELETE'])
+def remove_product(product_id):
+    return products_controller.remove_product(product_id)
