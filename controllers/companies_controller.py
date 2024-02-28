@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import jsonify, request
 import psycopg2
 import os
 
@@ -8,9 +8,6 @@ app_port = os.environ.get('APP_PORT')
 
 conn = psycopg2.connect(f"dbname={database_name}")
 cursor = conn.cursor()
-
-
-app = Flask(__name__)
 
 
 def add_company():
@@ -69,7 +66,7 @@ def get_by_company_id(company_id):
             SELECT * FROM Companies;
                     WHERE companyx_id
         """)
-    result = cursor.fetchall()
+    result = cursor.fetchone()
 
     for record in result:
         if record['company_id'] == int(company_id):
@@ -81,11 +78,11 @@ def update_company(company_id):
     post_data = request.form if request.form else request.get_json()
 
     result = cursor.execute("""
-  "UPDATE Company SET company_name=(%s)"
-  " WHERE company_id = (%s)", 
-  ("company_name")
-        """)
-    result = cursor.fetchall()
+  UPDATE Company SET company_name=%s
+   WHERE company_id = %s""",
+                            ("company_name")
+                            )
+    result = cursor.fetchone()
 
     record = {}
 

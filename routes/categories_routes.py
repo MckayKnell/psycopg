@@ -19,6 +19,6 @@ def get_by_category_id(category_id):
     return categories_controller.get_by_category_id(category_id)
 
 
-@categories.route('/companies/<category_id>', methods=['PUT'])
+@categories.route('/categories/<category_id>', methods=['PUT'])
 def update_category(category_id):
     return categories_controller.update_category(category_id)

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import jsonify, request
 import psycopg2
 import os
 
@@ -8,9 +8,6 @@ app_port = os.environ.get('APP_PORT')
 
 conn = psycopg2.connect(f"dbname={database_name}")
 cursor = conn.cursor()
-
-
-app = Flask(__name__)
 
 
 def add_product():
@@ -72,7 +69,7 @@ def products_get_all():
 def get_active_product():
     result = cursor.execute("""
             SELECT * FROM Products;
-                WHERE active=%s
+                WHERE active='true'
         """)
     result = cursor.fetchall()
 
@@ -121,11 +118,11 @@ def update_products(product_id):
     post_data = request.form if request.form else request.get_json()
 
     result = cursor.execute("""
-  "UPDATE Products SET product_name=(%s)"
-  " WHERE product_id = (%s)", 
-  ("product_name", "description", "price")
-        """)
-    result = cursor.fetchall()
+  UPDATE Products SET product_name=%s
+   WHERE product_id = %s""",
+                            ("product_name", "description", "price")
+                            )
+    result = cursor.fetchone()
 
     record = {}
 
@@ -146,7 +143,7 @@ def remove_product(product_id):
     result = cursor.execute("""
     SELECT * FROM Products WHERE product_id
         """)
-    result = cursor.fetchall()
+    result = cursor.fetchone()
 
     product = {}
 
