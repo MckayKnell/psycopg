@@ -39,7 +39,6 @@ def add_product():
         conn.commit()
 
     except:
-        cursor.rollback()
         return jsonify({'message': 'product could not be added'}), 400
 
     return jsonify({"message": f"Product {product_name} added to DB"}), 200
@@ -68,7 +67,7 @@ def products_get_all():
 
 def get_active_product():
     result = cursor.execute("""
-            SELECT * FROM Products;
+            SELECT * FROM Products
                 WHERE active='true'
         """)
     result = cursor.fetchall()
@@ -88,53 +87,54 @@ def get_active_product():
     return jsonify({"message": "products found", "results": record_list}), 200
 
 
-def products_by_company_id(company_id):
+def product_by_company_id(company_id):
     result = cursor.execute("""
-            SELECT * FROM Products;
-                    WHERE company_id
-        """)
-    result = cursor.fetchall()
+            SELECT * FROM Products
+                    WHERE company_id = %s
+        """, [company_id])
+    result = cursor.fetchone()
 
-    for record in result:
-        if record['company_id'] == int(company_id):
-            return jsonify({"message": "products found", "results": record}), 200
+    if result:
+        return jsonify({"message": "products found", "results": result}), 200
     return jsonify({"message": f'Company with id {company_id} not found.'}), 404
 
 
 def get_by_product_id(product_id):
     result = cursor.execute("""
-            SELECT * FROM Products;
-                    WHERE product_id
-        """)
-    result = cursor.fetchall()
+            SELECT * FROM Products
+                    WHERE product_id = %s
+        """, [product_id])
+    result = cursor.fetchone()
 
-    for product in result:
-        if product['product_id'] == int(product_id):
-            return jsonify({"message": "products found", "results": product}), 200
+    if result:
+        return jsonify({"message": "products found", "results": result}), 200
     return jsonify({"message": f'Products with id {product_id} not found.'}), 404
 
 
-def update_products(product_id):
+def update_product(product_id):
     post_data = request.form if request.form else request.get_json()
 
-    result = cursor.execute("""
+    cursor.execute("""
   UPDATE Products SET product_name=%s
    WHERE product_id = %s""",
-                            ("product_name", "description", "price")
-                            )
+                   ("product_name", "description", "price")
+                   )
+
+    cursor.execute("""
+                        SELECT * FROM Products WHERE product_id = %s""", [product_id])
     result = cursor.fetchone()
 
-    record = {}
+    cursor.fetchone()
 
-    for record in result:
-        if product['product_id'] == int(product_id):
-            product = record
+    result = {
+        "product_id": result[0],
+        "company_name": result[1],
+        "company_id": result[2],
+        "description": result[4],
+        "price": result[5]
 
-    product['name'] = post_data.get('name', product['name'])
-    product['description'] = post_data.get('description', product['description'])
-    product['price'] = post_data.get('price', product['price'])
-
-    return jsonify({'message': 'product Updated', 'results': product}), 200
+    }
+    return jsonify({'message': 'product Updated', 'results': result}), 200
 
 
 def remove_product(product_id):
